@@ -2,11 +2,14 @@
 
 Ivan
  - Look into DOTA2
+ 
 Alex
  - Look into segmentation problems
    - Brains
    - robots
-- Tianyu
+
+Tianyu
   - Generalized neural Models
-- Dylan 
+
+Dylan 
   - General board games
