@@ -8,8 +8,7 @@
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 
 \title{CS482/682 Final Project Report Group \todo{XX}\\
-  \large Using Unsupervsed Learned to provide a Competive Edge in a Classification
-Competition}
+  \large Using Unsupervsed Learned to provide a Competive Edge in a Classification Competition}
 
 \author{Tianyu Ding, Ivan Liao, Dylan Madisetti, Alex Sun}
 
@@ -37,11 +36,13 @@ Competition}
   understood that the competition task is non-trivial- thus this approach will
   guarantee some concrete deliverables.
 
-  \textbf{Stage 1}. In the first stage, unsupervised segmentation of . This
-  methodology can be benchmarked against the provided segmentation masks.
-  Completion of this stage will allow for car segmentation from an arbitrary
-  image. Further work may include benchmarking this unsupervised approach to a
-  supervised approach (using the provided segmentation masks as ground truth).
+  \textbf{Stage 1}. In the first stage, unsupervised segmentation of the
+  provided cars and their backgrounds. Unsupervised segmentation is well studied
+  as shown by \todo{find some refs, add some more detail\ref{}}. This methodology can be benchmarked
+  against the provided segmentation masks.  Completion of this stage will allow
+  for car segmentation from an arbitrary image. Further work may include
+  benchmarking this unsupervised approach to a supervised approach (using the
+  provided segmentation masks as ground truth).
 
   \textbf{Stage 2}. In the second stage, an embedding space of masked cars will
   be produced. Latent embedding spaces, contain powerful unsupervised
@@ -55,7 +56,7 @@ Competition}
   expressed as:
 
   $$\text{Loss}_\text{extra} = \alpha ||\frac{E\cdot E^T}{\epsilon |E|} - \mathbb{I}||_{L_p}, 1 > p > \infinty$$
-  
+
   For some measure $L_p$, to be determined experimentally, and some
   hyper-parameter $\alpha$, that dictates the influence of the added task. We
   note here that more overlap that an embedding has with another will produce a
@@ -73,7 +74,7 @@ Competition}
   \href{tsne}{http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf}.
 
   \textbf{Stage 3} The final aspect of the pipeline produces a labeled embedding
-  space.  
+  space.
   The segmentation vectors in the space produced by Stage 2, will be mapped will
   be mapped to a new space shared with learned model labels. This
   idea is borrowed from \href{https://arxiv.org/pdf/1705.00652.pdf}{Smart Reply} and can be bested expressed as semi-supervised

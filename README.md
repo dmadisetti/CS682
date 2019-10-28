@@ -1,15 +1,6 @@
-# Super cool project name
+# Using Unsupervsed Learned to provide a Competive Edge in a Classification Competition
+## AKA see cars, get money :car: :blue_car: :taxi:
 
-Ivan
- - Look into DOTA2
- 
-Alex
- - Look into segmentation problems
-   - Brains
-   - robots
-
-Tianyu
-  - Generalized neural Models
-
-Dylan 
-  - General board games
+This project seeks to use SOTA unsupervised techniques to develop a competive
+pipeline for the [PKU kaggle
+competition](https://www.kaggle.com/c/pku-autonomous-driving).
