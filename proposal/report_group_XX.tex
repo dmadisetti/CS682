@@ -22,6 +22,81 @@ Competition}
   % do not write an abstract
   \section{Introduction}
 
+  As a case study in how unsupervised learning can be used to tackle
+  established, benchmarkable problems, this project seeks to compete in the
+  \href{https://www.kaggle.com/c/pku-autonomous-driving}{Peking University/Baidu
+  Autonomous Vehicle Challenge}. This challenge provides pictures of traffic
+  while driving, and requires a prediction of the captured cars model type, and
+  positioning (yaw, pitch, roll, x, y, z). Auxiliary data is provided in the
+  form of 3D models for the cars of interest, and segmentation masks of the cars
+  against the background.
+
+  An unsupervised approach to solving this problem is proposed by a 3 stage
+  progressive pipeline. Each stage is a standalone, unsupervised methodology and
+  thus allows for incremental progress in tackling this challenge. It is
+  understood that the competition task is non-trivial- thus this approach will
+  guarantee some concrete deliverables.
+
+  \textbf{Stage 1}. In the first stage, unsupervised segmentation of . This
+  methodology can be benchmarked against the provided segmentation masks.
+  Completion of this stage will allow for car segmentation from an arbitrary
+  image. Further work may include benchmarking this unsupervised approach to a
+  supervised approach (using the provided segmentation masks as ground truth).
+
+  \textbf{Stage 2}. In the second stage, an embedding space of masked cars will
+  be produced. Latent embedding spaces, contain powerful unsupervised
+  information. Here, the provided masks will be used to extract cars from the
+  background. A convolutional neural net, followed by dense layers will map this
+  segmentation into some latent space. This latent space will then be "grown"
+  into a representation as with standard auto-encoders. To ensure task relevant
+  information, batches with unique car labels will be used. An added loss task
+  of weakly enforcing orthogonality will then be prescribed. Given a logit
+  representation "E" in the embedding space, this orthogonality constraint can be
+  expressed as:
+
+  $$\text{Loss}_\text{extra} = \alpha ||\frac{E\cdot E^T}{\epsilon |E|} - \mathbb{I}||_{L_p}, 1 > p > \infinty$$
+  
+  For some measure $L_p$, to be determined experimentally, and some
+  hyper-parameter $\alpha$, that dictates the influence of the added task. We
+  note here that more overlap that an embedding has with another will produce a
+  larger loss. The net loss will thus be given by:
+
+  $$\text{Loss} = \text{Loss}_\text{autoencoder} + \text{Loss}_\text{extra}$$
+
+  This space will then be clustered to provide transparency into the structure
+  of the latent space.  Specification and hyperparamters for these layers are to be determined-
+  however, our teams make special notice of the following networks that have had
+  success in processing image data: \todo{something \ref{}} . Note that this stage can occur
+  independently of Stage 1. Completion of this task should be a fully functional
+  auto-encoder, and a beautiful (hopefully) map of the latent space using a
+  method like
+  \href{tsne}{http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf}.
+
+  \textbf{Stage 3} The final aspect of the pipeline produces a labeled embedding
+  space.  
+  The segmentation vectors in the space produced by Stage 2, will be mapped will
+  be mapped to a new space shared with learned model labels. This
+  idea is borrowed from \href{https://arxiv.org/pdf/1705.00652.pdf}{Smart Reply} and can be bested expressed as semi-supervised
+  learning. This methodology is chosen such that an unspecified number of models
+  can be used in classification. In a given batch (with unique labels), a
+  softmax loss can be used by matching the labels to the given sample.
+  Further work includes developing means of
+  visualizing the latent "car space" by implementing information from the
+  provided 3D models.  \todo{viz latent spaces \ref{}}.
+
+  These pipelines will initially be trained independently on a segment of the
+  training data (refered to here as validation data). Later, the pipeline pieces
+  will feed each other and be training from end to end on the remaining dataset.
+  Labels can be extracted from the cosine comparison of labels and a given
+  encoding, and additional layers will be added to predict positioning. The
+  robustness of this technique can be expanded by feeding in augmented images as
+  exemplified by \todo{augmentation paper\ref{}}
+
+  \todo{Add in diagram of pipelines}
+
+  \todo{add in more referenes}
+  \todo{todo get feedback from everyone}
+
   \paragraph{Background}
   \paragraph{Related Work} \todo{e.g. previous supervised approaches, other unsupervised methods etc}
 
