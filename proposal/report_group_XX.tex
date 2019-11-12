@@ -1,38 +1,95 @@
 \documentclass[twocolumn]{article}
 
+\usepackage[margin = 1in, paperwidth = 8.5in, paperheight = 11in]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage[utf8]{inputenc}
-
+\usepackage{hyperref}
+\usepackage{mathpazo}
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 
-\title{CS482/682 Final Project Report Group \todo{XX}\\
-	\large \todo{your project title here}}
 
-\author{Your names/JHED here}
+\title{CS482/682 Final Project Proposal\\
+\large Using Unsupervised Learning in Classification of Autonomous Vehicles}
+
+\author{Tianyu Ding, Ivan Liao, Dylan Madisetti, Alex Sun}
 
 \date{}
 
 \begin{document}
-	
-	\maketitle
-	
-	% do not write an abstract
-	\section{Introduction}
-	\paragraph{Background} 
-	\paragraph{Related Work} \todo{e.g. previous supervised approaches, other unsupervised methods etc}
-	
-	\section{Methods}
-	\paragraph{Dataset} \todo{BRIEFLY describe the dataset and any pre-processing you may use that is special (e.g. downsample all images by x8 to enable colaboratory training etc.)}
-	
-	\paragraph{Setup, Training and Evaluation} \todo{IMPORTANT: you can change this paragraph to better fit your project. Questions to answer: What architecture did you chose and why? How did you accomplish un- or self-supervised learning? What tweaks were necessary to make this happen, e.g. custom layer designs, auxiliary tasks, etc.?}
-	
-	
-	
-	\section{Results}
-	
-	
-	\section{Discussion} \todo{make sure you use this section to showcase your understanding of the results you achieved and whether you could have / should have done things differently }
 
+  \maketitle
+
+  \section{Problem Statement}
+
+  It is well known that in autonomous driving the position of nearby
+automobiles is a key question for autonomous vehicles.  As a case study in how
+unsupervised learning can be used to tackle established, benchmarkable
+problems, this project seeks to compete in the
+\href{https://www.kaggle.com/c/pku-autonomous-driving}{Peking University/Baidu
+Autonomous Vehicle Challenge}.. We are interested in using advanced
+unsupervised learning techniques to help prediction of the model type and
+position of the captured cars.
+
+  \vspace{-.1in} \section{Dataset}
+
+  The above challenge provides dataset containing photos of streets, taken from
+the roof of a car. In particular, we have \begin{itemize} \item the images of
+cars and their \emph{pose} information \item  \emph{segmentation masks} of the
+cars against the background \item \emph{3D models} of the unmasked cars of
+interest \end{itemize}
+
+
+  \section{Outline of Solving the Problem}
+
+   An unsupervised approach to solving this problem is proposed by a 3 stage
+progressive pipeline. Each stage is a standalone, unsupervised methodology and
+thus allows for incremental progress.
+
+  \textbf{Stage 1}. In the first stage, images of traffic will be segmented
+into distinct cars and the background. To achieve this, a U-net like model will
+provide segmentation of all the cars with respect to the background. Then, an
+unsupervised model (K-Mean or Gaussian Mixture) will be applied to the
+segmented mask in obtaining the distinct clusters of cars \cite{Ji2019}.
+
+  \textbf{Stage 2}. In the second stage, an embedding space of masked cars will
+be produced. Using the mask, individual cars will be extracted (bounding box)
+from the background to form a dataset. A convolutional neural network, followed
+by dense layers will map this segmentation into some latent space, which
+be "grown" into a representation as with standard auto-encoders.
+
+  In the context of autonomous driving, the latent space will be clustered to
+provide transparency into the structure of the data relations based on the
+semantic distribution of the dataset such as the type (SUV or Sedan), the model
+or the shape of the car. Note that this stage can occur independently of Stage 1
+using the provided label mask. Completion of this task should be a fully
+functional auto-encoder, and a beautiful (hopefully) map of the latent space
+using a method like in \cite{Maaten2008}.
+
+  \textbf{Stage 3} The final aspect of the pipeline produces a labeled
+embedding space. The segmentation vectors in the space produced by Stage 2,
+will be mapped into a new space shared with learned model labels, such as the
+position, yaw, pitch or the roll. This idea is borrowed from
+\cite{Henderson2017} and can be bested expressed as semi-supervised learning.
+This methodology is chosen such that an unspecified number of models can be
+used in classification. In a given batch (with unique labels), a softmax loss
+can be used by matching the labels to the given sample. Further work includes
+developing means of visualizing the latent "car space" by implementing
+information from the provided 3D models.
+
+\begin{thebibliography}{8} \bibitem{Maaten2008} Van der Maaten, L. and Hinton,
+G. Visualizing Data using t-SNE. \textit{Journal of Machine Learning Research},
+(9) 2579-2605, 2008.
+
+  \bibitem{Ji2019} Ji, X. and Henriques, J. and Vedaldi, A. Invariant
+Information Clustering for Unsupervised Image Classification and Segmentation.
+\textit{The IEEE International Conference on Computer Vision (ICCV)},2019.
+
+  \bibitem{Henderson2017} Henderson, M. and Al-Rfou, R. and Strope, B. and
+Sung, Y. and Lukacs, L. and Guo, R. and Kumar, S. and Miklos, B. and Kurzweil,
+R.  Efficient Natural Language Response Suggestion for Smart Reply.
+\textit{arXiv:1705.00652}.
+
+\end{thebibliography}
 \end{document}
