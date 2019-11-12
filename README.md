@@ -1,4 +1,4 @@
-# Using Unsupervsed Learned to provide a Competive Edge in a Classification Competition
+# Using Unsupervised Learning in Classification for Autonomous Vehicles
 ## AKA see cars, get money :car: :blue_car: :taxi:
 
 This project seeks to use SOTA unsupervised techniques to develop a competive
