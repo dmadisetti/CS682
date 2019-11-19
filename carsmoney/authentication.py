@@ -3,16 +3,18 @@ import os
 import getpass
 import urllib
 import json
-import utils
-from exceptions import CashMoneyCarsException
+from .utils import PROVISIONING_SCRIPT
+from .exception import CashMoneyCarsException
 
 
-def authenticate(token=None):
+def authenticate(token=None, debug=False):
     if not token:
         raise CashMoneyCarsException(("Provide token from "
                                       "https://dashboard.ngrok.com/auth"))
 
-    print(os.popen(PROVISION_SCRIPT.format(token=token)).read())
+    result = os.popen(PROVISIONING_SCRIPT.format(token=token)).read()
+    if debug:
+        print(result)
 
     # Start daemon services. Need ipython so it can hang.
     get_ipython().system_raw('/usr/sbin/sshd -D &')
@@ -24,6 +26,5 @@ def authenticate(token=None):
     with urllib.request.urlopen(
             'http://localhost:4040/api/tunnels/first') as response:
         data = json.loads(response.read().decode())
-        endpoint = data['public_url']
         [host, port] = data['public_url'][6:].split(':')
-        print(f'SSH command: ssh root@{endpoint}')
+        print(f'SSH command: ./sync.sh {port}')

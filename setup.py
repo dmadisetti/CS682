@@ -7,13 +7,14 @@ REQS = [
 ]
 
 setup(
-    name='moneycars',
+    name='carsmoney',
     version='0.0.1',
     packages=[
-        'moneycars'
+        'carsmoney'
     ],
     url='https://github.com/dmadisetti/CS682',
     tests_require=['nose'],
+    include_package_data=True,
     license='No License for now. Please contact authors.',
     author='Tianyu Ding, Ivan Liao, Dylan Madisetti, Alex Sun',
     author_email='madisetti@jhu.edu',
