@@ -108,6 +108,13 @@ car_name2id = {label.name: label for label in models}
 car_id2name = {label.id: label for label in models}
 
 
+def get_extremes(image):
+    top = np.unravel_index(image.argmax(), image.shape)
+    corner = np.unravel_index(np.flip(image).argmax(), image.shape)
+    bottom = tuple(s - c for c, s in zip(corner, image.shape))
+    return (max(top[0] - 1, 1), max(bottom[0] - 1, 1))
+
+
 # convert euler angle to rotation matrix
 def euler_to_Rot(yaw, pitch, roll):
     Y = np.array([[cos(yaw), 0, sin(yaw)], [0, 1, 0], [-sin(yaw), 0,
@@ -150,8 +157,13 @@ def load_jsons(json_path="train/json"):
 
 
 def create_masks(data_path="train/data",
+                 mask_path="train/data",
                  train_path="train.csv",
-                 json_path="train/json"):
+                 json_path="train/json",
+                 square_crop=True,
+                 export_crops=True,
+                 mask_only=True,
+                 export_masks=True):
     """Generates Segmenation masks from dataset provided a path."""
     train = load_data(data_path, train_path)
     jsons = load_jsons(json_path)
@@ -159,12 +171,11 @@ def create_masks(data_path="train/data",
         image = cv2.imread(f"{data_path}/{image_id}.jpg",
                            cv2.COLOR_BGR2RGB)[:, :, ::-1]
 
-        batch.reindex(
-            np.linalg.norm(np.array([x for x in batch.Prediction])[:, -3:],
-                           axis=1).argsort())
-
         overlay = np.zeros_like(image)
-        for idx, car in batch.iterrows():
+        for idx, car in batch.reindex(
+                np.linalg.norm(np.array([x for x in batch.Prediction])[:, -3:],
+                               axis=1).argsort()).iterrows():
+
             data = jsons[car_id2name[car.CarId].name]
 
             # do the transformation from 3D to 2D projection
@@ -195,11 +206,21 @@ def create_masks(data_path="train/data",
 
             # change it to boolean mask
             mask = (temp == 255)
-            left_corner = np.unravel_index(mask.argmax(), mask.shape)
-            corner = np.unravel_index(np.flip(mask).argmax(), mask.shape)
-            right_corner = (s - c for c, s in zip(corner, mask.shape))
-            # Squarize and crop!
 
+            # Squarize and crop!
+            if export_crops:
+                prefix = "crop"
+                extremes_row = get_extremes(mask)
+                extremes_col = get_extremes(np.rot90(mask))
+                cropped = image
+                if mask_only:
+                    prefix = "masked"
+                    cropped[~mask[:, :, 2]] = [0, 0, 0]
+                cropped = cropped[extremes_row[0]:extremes_row[1],
+                                  -extremes_col[1]:-extremes_col[0]]
+                cv2.imwrite(f"{mask_path}/{prefix}_{image_id}_{idx}.jpg",
+                            cropped)
             overlay[mask] = car.CarId
 
-        cv2.imwrite(f"{data_path}/{image_id}_mask.jpg", overlay[:, :, 2])
+        if export_masks:
+            cv2.imwrite(f"{mask_path}/{image_id}_mask.jpg", overlay[:, :, 2])
