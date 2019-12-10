@@ -232,6 +232,5 @@ def create_masks(data_path="train/data",
         if export_masks:
             cv2.imwrite(f"{mask_path}/{image_id}_mask.jpg", overlay[:, :, 2])
 
-    dd.from_pandas(train, npartitions=4).groupby("ImageId"),
-        ).map_partitions(lambda df: df.apply(process)).compute(
+    dd.from_pandas(train, npartitions=4).groupby("ImageId").map_partitions(lambda df: df.apply(process)).compute(
             get=get)
