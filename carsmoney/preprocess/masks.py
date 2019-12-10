@@ -117,6 +117,14 @@ def get_extremes(image):
     return (max(top[0] - 1, 1), max(bottom[0] - 1, 1))
 
 
+def get_corners(image):
+    extremes_row = get_extremes(image)
+    extremes_col = get_extremes(np.rot90(image))
+    return [
+        extremes_row[0], extremes_row[1], -extremes_col[1], -extremes_col[0]
+    ]
+
+
 # convert euler angle to rotation matrix
 def euler_to_Rot(yaw, pitch, roll):
     Y = np.array([[cos(yaw), 0, sin(yaw)], [0, 1, 0], [-sin(yaw), 0,
@@ -165,7 +173,8 @@ def create_masks(data_path="train/data",
                  square_crop=True,
                  export_crops=True,
                  mask_only=True,
-                 export_masks=True):
+                 export_masks=True,
+                 partitions=30):
     """Generates Segmenation masks from dataset provided a path."""
     train = load_data(data_path, train_path)
     jsons = load_jsons(json_path)
@@ -207,14 +216,12 @@ def create_masks(data_path="train/data",
             # Squarize and crop!
             if export_crops:
                 prefix = "crop"
-                extremes_row = get_extremes(mask)
-                extremes_col = get_extremes(np.rot90(mask))
+                corners = get_corners(mask)
                 cropped = image
                 if mask_only:
                     prefix = "masked"
                     cropped[~mask[:, :, 2]] = [0, 0, 0]
-                cropped = cropped[extremes_row[0]:extremes_row[1],
-                                  -extremes_col[1]:-extremes_col[0]]
+                cropped = cropped[corners[0]:corners[1], corners[2]:corners[3]]
                 cv2.imwrite(f"{mask_path}/{prefix}_{image_id}_{idx}.jpg",
                             cropped)
             overlay[mask] = car.CarId
@@ -231,6 +238,7 @@ def create_masks(data_path="train/data",
                 format_image(image_id, image, overlay), axis=1)
         if export_masks:
             cv2.imwrite(f"{mask_path}/{image_id}_mask.jpg", overlay[:, :, 2])
+        return True
 
-    dd.from_pandas(train, npartitions=4).groupby("ImageId").map_partitions(lambda df: df.apply(process)).compute(
-            get=get)
+    dd.from_pandas(train, npartitions=partitions).groupby("ImageId").apply(
+        process, meta=('processes', bool)).compute()

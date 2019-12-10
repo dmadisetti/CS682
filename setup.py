@@ -4,6 +4,7 @@ from setuptools import setup
 REQS = [
     "futures==3.1.1",
     "yapf==0.24.0",
+    "partd==1.1.0",
 ]
 
 setup(
@@ -11,7 +12,6 @@ setup(
     version='0.0.1',
     packages=[
         'carsmoney'
-        'carsmoney/preprocess'
     ],
     url='https://github.com/dmadisetti/CS682',
     tests_require=['nose'],
