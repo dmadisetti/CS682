@@ -11,7 +11,7 @@ setup(
     version='0.0.1',
     packages=[
         'carsmoney'
-        'carsmoney.preprocess'
+        'carsmoney/preprocess'
     ],
     url='https://github.com/dmadisetti/CS682',
     tests_require=['nose'],
