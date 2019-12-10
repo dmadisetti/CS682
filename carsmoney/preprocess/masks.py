@@ -8,6 +8,8 @@ import cv2
 from collections import namedtuple
 from glob import glob
 from pathlib import Path
+import dask.dataframe as dd
+from dask.multiprocessing import get
 
 from carsmoney.utils import CAMERA as k
 
@@ -167,15 +169,10 @@ def create_masks(data_path="train/data",
     """Generates Segmenation masks from dataset provided a path."""
     train = load_data(data_path, train_path)
     jsons = load_jsons(json_path)
-    for image_id, batch in train.groupby("ImageId"):
-        image = cv2.imread(f"{data_path}/{image_id}.jpg",
-                           cv2.COLOR_BGR2RGB)[:, :, ::-1]
 
-        overlay = np.zeros_like(image)
-        for idx, car in batch.reindex(
-                np.linalg.norm(np.array([x for x in batch.Prediction])[:, -3:],
-                               axis=1).argsort()).iterrows():
-
+    def format_image(image_id, image, overlay):
+        def fn(car):
+            idx = car.name
             data = jsons[car_id2name[car.CarId].name]
 
             # do the transformation from 3D to 2D projection
@@ -222,5 +219,19 @@ def create_masks(data_path="train/data",
                             cropped)
             overlay[mask] = car.CarId
 
+        return fn
+
+    def process(batch):
+        image_id = batch["ImageId"].iloc[0]
+        image = cv2.imread(f"{data_path}/{image_id}.jpg",
+                           cv2.COLOR_BGR2RGB)[:, :, ::-1]
+        overlay = np.zeros_like(image)
+        batch.set_index(batch.Prediction.apply(
+            np.linalg.norm).argsort()).sort_index(ascending=False).apply(
+                format_image(image_id, image, overlay), axis=1)
         if export_masks:
             cv2.imwrite(f"{mask_path}/{image_id}_mask.jpg", overlay[:, :, 2])
+
+    dd.from_pandas(train, npartitions=4).groupby("ImageId"),
+        ).map_partitions(lambda df: df.apply(process)).compute(
+            get=get)
