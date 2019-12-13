@@ -2,7 +2,7 @@ __all__ = ["authenticate", "pipelines"]
 
 from .authentication import authenticate
 from .pipeline import pipelines
-import carsmoney.preprocess.masks as masks
+from .preprocess import masks, resize
 
 import os
 def reset():
