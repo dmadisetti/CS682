@@ -5,6 +5,8 @@ REQS = [
     "futures==3.1.1",
     "yapf==0.24.0",
     "partd==1.1.0",
+    "fsspec>=0.3.3",
+    "dask==2.9.0",
 ]
 
 setup(
