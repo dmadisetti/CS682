@@ -6,7 +6,10 @@ REQS = [
     "yapf==0.24.0",
     "partd==1.1.0",
     "fsspec>=0.3.3",
+    "torch>=1.3.1",
+    "torchvision>=0.4.2",
     "dask==2.9.0",
+    "Pillow>=6.2.1",
 ]
 
 setup(
