@@ -1,17 +1,20 @@
 from abc import ABC, abstractmethod
 
+
 class Pipeline(ABC):
     @abstractmethod
     def load_data(self, *args, **kwargs):
         """Should load data for pipeline."""
-
+    @abstractmethod
+    def build_model(self, *args, **kwargs):
+        """Should build the model for the pipeline."""
     @abstractmethod
     def train(self, *args, **kwargs):
         """Should train on loaded data."""
-
     @abstractmethod
     def test(self, *args, **kwargs):
         """Should run inference on provided data."""
+
 
 class Pipelines(dict):
     """Accessor for registered pipelines"""

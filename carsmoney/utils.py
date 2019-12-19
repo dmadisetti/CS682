@@ -1,6 +1,9 @@
 import os
 import numpy as np
 from collections import namedtuple
+import torch
+
+GPU_BOOL = torch.cuda.is_available()
 
 PROVISIONING_SCRIPT = open(
     os.path.join(os.path.dirname(__file__), 'provision.sh')).read()
